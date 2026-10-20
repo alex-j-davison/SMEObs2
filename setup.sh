@@ -1,42 +1,47 @@
-# Instance type: m5/xlarge (vcpu 4 / 16 GiB ram)
-# Operating System: Ubuntu 20.04
+# Instance type: m6a.xlarge (vcpu 4/16 GiB ram)
+# Operating System: Ubuntu 22.04
 # Disk Storage 100 Gib SSD
 
-echo "###############################################################"
-echo "# Script: Step-1 Setup observability instance                 #"
-echo "# Description: To create a observability instance.            #"
-echo "# Created date: 09/09/26                                      #"
-echo "# Arthur: Alex J Davison (alexdav@cisco.com)                  #"
-echo "# Version: 1.0.0                                              #"
-echo "# Starting...                                                 #"
-echo "###############################################################"
+echo "##################################################################"
+echo "# Script: Setup observability instance SME Obs 2                 #"
+echo "# Description: To create a observability instance for SME Obs 2. #"
+echo "# Created date: 20/10/26                                         #"
+echo "# Arthur: Alex J Davison (alexdav@cisco.com)                     #"
+echo "# Version: 1.0.0                                                 #"
+echo "# Starting...                                                    #"
+echo "##################################################################"
 echo ""
 echo "#############"
 echo "# Update OS #"
 echo "#############"
 echo ""
-echo "Step 1/11: Updating OS"
+echo "Step 1/1: Updating OS"
 sudo apt-get update
-echo "Step 2/11: Get IP values"
+echo ""
+echo "#####################"
+echo "# Update Networking #"
+echo "#####################"
+echo ""
+echo "Step 1/10: Get IP values"
 sudo resolvectl >> ip.log
-echo "Step 3/11: Find DNS servers"
+echo "Step 3/10: Find DNS servers"
 cat ip.log | grep "DNS Servers: " * > dns.log
-echo "Step 4/11: Remove IP values file"
+echo "Step 4/10: Remove IP values file"
 rm ip.log
-echo "Step 5/11: Load DNS values into memory"
+echo "Step 5/10: Load DNS values into memory"
 dnsvalue=`cat dns.log`
-echo "Step 6/11: Trim crap"
+echo "Step 6/10: Trim crap"
 dnsvalue=${dnsvalue:27}
-echo "Step 7/11: Write new trimmed DNS values"
+echo "Step 7/10: Write new trimmed DNS values"
 echo $dnsvalue >> new_dns.log
-echo "Step 8/11: Remove DNS values file"
+echo "Step 8/10: Remove DNS values file"
 rm dns.log
-echo "Step 9/11: Format DNS servers"
+echo "Step 9/10: Format DNS servers"
 sed -i 's/ /,/g' new_dns.log
-echo "Step 10/11: Load new DNS values"
+echo "Step 10/10: Load new DNS values"
 cat new_dns.log
 dnsvalue=`cat new_dns.log`
-echo "Step 11/11: Clean up"
+echo "Step 11/10: Clean up"
 rm new_dns.log
 echo ""
 echo "####################"
@@ -50,7 +55,7 @@ sudo usermod -a -G microk8s $USER
 echo "Step 3/5: Make directory"
 sudo mkdir -p ~/.kube
 echo "Step 4/5: Change permission on folder"
-chmod 0700 ~/.kube
+sudo chmod 0700 ~/.kube
 echo "Step 5/5: Enable features for microk8s"
 sudo microk8s enable dns:$dnsvalue rbac hostpath-storage ingress cert-manager dashboard istio registry
 echo ""
@@ -84,9 +89,9 @@ echo "######################"
 echo "# Download helm repo #"
 echo "######################"
 echo ""
-echo "Step 2/3: Adding otel collector"
+echo "Step 1/2: Adding otel collector"
 sudo microk8s helm repo add splunk-otel-collector-chart https://signalfx.github.io/splunk-otel-collector-chart
-echo "Step 3/4: Updating helm repos"
+echo "Step 2/2: Updating helm repos"
 sudo microk8s helm repo update
 echo ""
 echo "#####################"

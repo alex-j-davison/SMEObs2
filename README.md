@@ -8,7 +8,7 @@ Script does the following:-
 * Description:Script to build a new microk8s environment
 * Created by: Alex J Davison (alexdav@cisco.com)
 * Created date: 09/09/26
-* Version: 1.0.0
+* Version: 2.0.0
 
 ## Scope of script
 
@@ -24,7 +24,7 @@ Script does the following:-
 
 * .gitattributes - (https://git-scm.com/docs/gitattributes)
 * .gitignore - (https://git-scm.com/docs/gitignore)
-* LICENSE
+* LICENSE - 
 * README.md - This file (https://www.markdownguide.org/basic-syntax/)
 * setup.sh - Setup script to create a new microk8s environment
 
@@ -48,11 +48,6 @@ Steps:-
 
 <code> ./obs-sme2/setup.sh | tee setupLog.log</code>
 
-5. Add annotate to pods
-
-<code>sudo microk8s kubectl -n kubeinvaders annotate pod kubeinvaders-$POD_ID$ prometheus.io/scrape=true</code>
-
-<code>sudo microk8s kubectl -n kubeinvaders annotate pod kubeinvaders-$POD_ID$ prometheus.io/port=8080</code>
 
 ## User guide
 
