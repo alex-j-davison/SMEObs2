@@ -118,3 +118,20 @@ echo ""
 echo "Step 2/2: Status"
 sudo microk8s kubectl get all --all-namespaces
 echo ""
+
+
+sudo apt install -y npm
+
+npm install express
+
+npm run start
+
+npm run dev
+
+
+
+sudo git clone https://github.com/splunk/pacman.git
+
+sudo microk8s kubectl create ns pacman
+
+sudo microk8s helm -n pacman install <> --values ./pacman/kubernetes/k8s.yaml <>

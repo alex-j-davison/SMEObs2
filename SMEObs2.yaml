@@ -14,13 +14,6 @@ agent:
             include_metadata: true
       kubeletstats:
         insecure_skip_verify: true
-      prometheus:
-        config:
-          scrape_configs:
-            - job_name: 'kubeinvaders'
-              scrape_interval: 5s
-              static_configs:
-                - targets: ['0.0.0.0:8080']
 
     service:
       pipelines:
