@@ -101,7 +101,7 @@ echo ""
 echo "Step 1/2: Create otel namespace"
 sudo microk8s kubectl create ns otel
 echo "Step 2/2: Install new config to namespace splunkotel"
-sudo microk8s helm -n otel install splunk-otel-collector --values ./SMEObs/SMEObs.yaml splunk-otel-collector-chart/splunk-otel-collector
+sudo microk8s helm -n otel install splunk-otel-collector --values ./SMEObs/SMEObs2.yaml splunk-otel-collector-chart/splunk-otel-collector
 echo ""
 echo "################"
 echo "# Verification #"

@@ -1,0 +1,83 @@
+agent:
+  enabled: true
+  discovery:
+    enabled: true
+  config:
+    receivers:
+      signalfx:
+        endpoint: 0.0.0.0:9943
+      otlp:
+        protocols:
+          grpc:
+            include_metadata: true
+          http:
+            include_metadata: true
+      kubeletstats:
+        insecure_skip_verify: true
+      prometheus:
+        config:
+          scrape_configs:
+            - job_name: 'kubeinvaders'
+              scrape_interval: 5s
+              static_configs:
+                - targets: ['0.0.0.0:8080']
+
+    service:
+      pipelines:
+        metrics:
+          receivers:
+          - otlp
+          - signalfx
+          - prometheus
+
+# Gateway disable 
+gateway:
+  enabled: false
+operator:
+  enabled: true
+operatorcrds:
+  install: true
+clusterReceiver:
+  enabled: true
+logsCollection:
+  containers:
+    enabled: true
+featureGates:
+  useLightPrometheusReceiver: true
+
+#
+clusterName: ajdSMEObs2
+environment: ajdSMEObs2Test
+
+# Connection to Splunk Observability
+splunkObservability:
+  # Ingestion token 
+  accessToken: KsSHTHDvadWBbdZ9pA0O-Q
+  profilingEnabled: true
+  # Realm to send data to
+  realm: us1
+  # Send metric to Splunk Observability
+  metricsEnabled: true
+  # Don't send traces to Splunk Observability
+  tracesEnabled: false
+
+# Connection to Splunk OD Case Cloud Stack
+splunkPlatform:
+  # API end point
+  endpoint: https://http-inputs.splunkods.splunkcloud.com:443/services/collector/event
+  # HEC token
+  token: a319f672-1b42-4201-a443-54b35ae6f1d8
+  # Index to be used
+  index: "ajddefault"
+  # Don't send metrics to Splunk Cloud
+  metricsEnabled: false
+  # Don't send traces to Splunk Cloud
+  tracesEnabled: false
+  # Send logs to Splunk Cloud
+  logsEnabled: true
+  # Insecure connection
+  insecureSkipVerify: true
+
+#
+autodetect:
+  prometheus: true
