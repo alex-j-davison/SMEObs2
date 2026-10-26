@@ -12,7 +12,7 @@ agent:
             include_metadata: true
           http:
             include_metadata: true
-      kubeletstats:
+      kubelet_stats:
         insecure_skip_verify: true
 
     service:

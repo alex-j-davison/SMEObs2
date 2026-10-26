@@ -108,22 +108,7 @@ echo ""
 echo "Step 1/2: Create otel namespace"
 sudo microk8s kubectl create ns otel
 echo "Step 2/2: Install new config to namespace splunkotel"
-sudo microk8s helm -n otel install splunk-otel-collector --values ./SMEObs/SMEObs2.yaml splunk-otel-collector-chart/splunk-otel-collector
-echo ""
-echo "################"
-echo "# Verification #"
-echo "################"
-echo ""
-echo "Step 1/2: Wait before checking"
-total_seconds=60
-while [ $total_seconds -gt 0 ]; do
-    printf "Time remaining: %d seconds\r" "$total_seconds"
-    sleep 1
-    total_seconds=$((total_seconds - 1))
-done
-echo ""
-echo "Step 2/2: Status"
-sudo microk8s kubectl get all --all-namespaces
+sudo microk8s helm -n otel install splunk-otel-collector --values ./obs-sme2/SMEObs2.yaml splunk-otel-collector-chart/splunk-otel-collector
 echo ""
 echo "################"
 echo "# Pacman Repo #"
@@ -189,6 +174,22 @@ echo "Step 21/22: Export pacman from docker"
 sudo docker save pacman:latest > pacman.tar
 echo "Step 22/22: Import pacman into microk8s"
 sudo microk8s ctr image import pacman.tar
+echo ""
+echo "################"
+echo "# Verification #"
+echo "################"
+echo ""
+echo "Step 1/2: Wait before checking"
+total_seconds=60
+while [ $total_seconds -gt 0 ]; do
+    printf "Time remaining: %d seconds\r" "$total_seconds"
+    sleep 1
+    total_seconds=$((total_seconds - 1))
+done
+echo ""
+echo "Step 2/2: Status"
+sudo microk8s kubectl get all --all-namespaces
+
 
 
 ## import docker image into micrk8s registry
