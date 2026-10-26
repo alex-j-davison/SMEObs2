@@ -7,7 +7,7 @@ echo "# Script: Setup observability instance SME Obs 2                 #"
 echo "# Description: To create a observability instance for SME Obs 2. #"
 echo "# Created date: 20/10/26                                         #"
 echo "# Arthur: Alex J Davison (alexdav@cisco.com)                     #"
-echo "# Version: 1.0.0                                                 #"
+echo "# Version: 2.0.0                                                 #"
 echo "# Starting...                                                    #"
 echo "##################################################################"
 echo ""
@@ -57,7 +57,14 @@ sudo mkdir -p ~/.kube
 echo "Step 4/5: Change permission on folder"
 sudo chmod 0700 ~/.kube
 echo "Step 5/5: Enable features for microk8s"
-sudo microk8s enable dns:$dnsvalue rbac hostpath-storage ingress cert-manager dashboard istio registry
+sudo microk8s enable dns:$dnsvalue 
+sudo microk8s enable rbac 
+sudo microk8s enable hostpath-storage 
+sudo microk8s enable ingress 
+sudo microk8s enable cert-manager 
+sudo microk8s enable dashboard 
+sudo microk8s enable istio 
+sudo microk8s enable registry
 echo ""
 echo "##########################"
 echo "# Creates microk8s alias #"
@@ -131,17 +138,17 @@ echo "##########"
 echo "# Docker #"
 echo "##########"
 echo ""
-echo "Step 1/10: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
+echo "Step 1/22: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
 sudo apt-get update
-echo "Step 2/10: Setup certificates"
+echo "Step 2/22: Setup certificates"
 sudo apt install ca-certificates curl
-echo "Step 3/10: Add Docker's official GPG key"
+echo "Step 3/22: Add Docker's official GPG key"
 sudo install -m 0755 -d /etc/apt/keyrings
-echo "Step 4/10: Add Docker's official GPG key"
+echo "Step 4/22: Add Docker's official GPG key"
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-echo "Step 5/10: Add Docker's official GPG key"
+echo "Step 5/22: Add Docker's official GPG key"
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo "Step 6/10: Add the repository to Apt sources"
+echo "Step 6/22: Add the repository to Apt sources"
 sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
 Types: deb
 URIs: https://download.docker.com/linux/ubuntu
@@ -150,36 +157,39 @@ Components: stable
 Architectures: $(dpkg --print-architecture)
 Signed-By: /etc/apt/keyrings/docker.asc
 EOF
-echo "Step 7/18: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
+echo "Step 7/22: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
 sudo apt update
-echo "Step 8/18:"
+echo "Step 8/22: Install docker"
 sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-echo "Step 9/18:"
+echo "Step 9/22: Stop docker"
 sudo systemctl stop docker
-echo "Step 10/18:"
+echo "Step 10/22: Stop containerd"
 sudo systemctl stop containerd
-echo "Step 11/18:"
+echo "Step 11/22: Clean up snapshotter"
 sudo rm -rf /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*
-echo "Step 12/18:"
+echo "Step 12/22: Start containerd"
 sudo systemctl start containerd
-echo "Step 13/18:"
+echo "Step 13/22: Start docker"
 sudo systemctl start docker
-echo "Step 14/18:"
+echo "Step 14/22: Ensure correct repo"
 apt-cache madison containerd.io
-echo "Step 15/18:"
+echo "Step 15/22: Install fuse overlay fsß"
 sudo apt install fuse-overlayfs
-echo "Step 16/18:"
+echo "Step 16/22: Make directory /etc/docker"
 sudo mkdir -p /etc/docker
-echo "Step 17/18:"
+echo "Step 17/22: Set storage path"
 sudo echo '{ "storage-driver": "fuse-overlayfs" }' | sudo tee /etc/docker/daemon.json
-echo "Step 18/18:"
+echo "Step 18/22: Restart docker"
 sudo systemctl restart docker
-echo "Step 18/18:"
+echo "Step 19/22: Build docker pacman image"
 sudo docker build --no-cache -t pacman:latest -f  pacman/docker/Dockerfile pacman
-echo "Step 18/18:"
+echo "Step 20/22: List docker images"
 sudo docker images
-echo "Step 18/18:"
+echo "Step 21/22: Export pacman from docker"
 sudo docker save pacman:latest > pacman.tar
+echo "Step 22/22: Import pacman into microk8s"
+sudo microk8s ctr image import pacman.tar
+
 
 ## import docker image into micrk8s registry
 ## docker save pacman:latest |  /snap/bin/microk8s ctr image import -
