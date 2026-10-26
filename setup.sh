@@ -15,7 +15,7 @@ echo "#############"
 echo "# Update OS #"
 echo "#############"
 echo ""
-echo "Step 1/1: Updating OS"
+echo "Step 1/1: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
 sudo apt-get update
 echo ""
 echo "#####################"
@@ -118,20 +118,72 @@ echo ""
 echo "Step 2/2: Status"
 sudo microk8s kubectl get all --all-namespaces
 echo ""
-
-
-sudo apt install -y npm
-
-npm install express
-
-npm run start
-
-npm run dev
-
-
-
+echo "################"
+echo "# Pacman Repo #"
+echo "################"
+echo ""
+echo "Step 1/1: Clone repo for pacman"
 sudo git clone https://github.com/splunk/pacman.git
-
+echo ""
 sudo microk8s kubectl create ns pacman
+echo ""
+echo "##########"
+echo "# Docker #"
+echo "##########"
+echo ""
+echo "Step 1/10: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
+sudo apt-get update
+echo "Step 2/10: Setup certificates"
+sudo apt install ca-certificates curl
+echo "Step 3/10: Add Docker's official GPG key"
+sudo install -m 0755 -d /etc/apt/keyrings
+echo "Step 4/10: Add Docker's official GPG key"
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+echo "Step 5/10: Add Docker's official GPG key"
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo "Step 6/10: Add the repository to Apt sources"
+sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+echo "Step 7/18: Downloads the package lists from the repositories and "updates" them to get information on the newest versions of packages and their dependencies."
+sudo apt update
+echo "Step 8/18:"
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+echo "Step 9/18:"
+sudo systemctl stop docker
+echo "Step 10/18:"
+sudo systemctl stop containerd
+echo "Step 11/18:"
+sudo rm -rf /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/*
+echo "Step 12/18:"
+sudo systemctl start containerd
+echo "Step 13/18:"
+sudo systemctl start docker
+echo "Step 14/18:"
+apt-cache madison containerd.io
+echo "Step 15/18:"
+sudo apt install fuse-overlayfs
+echo "Step 16/18:"
+sudo mkdir -p /etc/docker
+echo "Step 17/18:"
+sudo echo '{ "storage-driver": "fuse-overlayfs" }' | sudo tee /etc/docker/daemon.json
+echo "Step 18/18:"
+sudo systemctl restart docker
+echo "Step 18/18:"
+sudo docker build --no-cache -t pacman:latest -f  pacman/docker/Dockerfile pacman
+echo "Step 18/18:"
+sudo docker images
+echo "Step 18/18:"
+sudo docker save pacman:latest > pacman.tar
 
-sudo microk8s helm -n pacman install <> --values ./pacman/kubernetes/k8s.yaml <>
+## import docker image into micrk8s registry
+## docker save pacman:latest |  /snap/bin/microk8s ctr image import -
+## sudo microk8s helm -n pacman install --values ./pacman/kubernetes/k8s.yaml
+## sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+## import docker image into micrk8s registry
+## docker save pacman:latest |  /snap/bin/microk8s ctr image import -
