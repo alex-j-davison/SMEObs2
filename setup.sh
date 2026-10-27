@@ -96,6 +96,7 @@ echo "######################"
 echo "# Download helm repo #"
 echo "######################"
 echo ""
+sudo microk8s helm repo add pacman https://alex-j-davison.github.io/alex-j-davison/helm-charts/
 echo "Step 1/2: Adding otel collector"
 sudo microk8s helm repo add splunk-otel-collector-chart https://signalfx.github.io/splunk-otel-collector-chart
 echo "Step 2/2: Updating helm repos"
@@ -174,6 +175,8 @@ echo "Step 21/22: Export pacman from docker"
 sudo docker save pacman:latest > pacman.tar
 echo "Step 22/22: Import pacman into microk8s"
 sudo microk8s ctr image import pacman.tar
+echo ""
+sudo microk8s kubectl apply -f ./obs-sme2/k8s.yaml -n pacman
 echo ""
 echo "################"
 echo "# Verification #"
